@@ -13,44 +13,44 @@ App = React.createClass({
       loading: true // 2.
     });
 
-    this.getGif(searchingText, function(gif) { // 3.
+    this.getGif(searchingText).then (gif => { // 3.
       this.setState({ // 4
         loading: false, // a
         gif: gif, // b
         searchingText: searchingText // c
       });
-    }.bind(this)); 
+    });
   },
 
 
-  getGif: function(searchingText) {
-        var GIPHY_PUB_KEY = 'Tj0Zkn8M11H60GBwCg70bAUZ0IDvheBi';
-        var GIPHY_API_URL = 'https://api.giphy.com';
-        var url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;
-        
-       return new Promise(
-            function(resolve, reject) {
-                var request = new XMLHttpRequest();
-                request.onload = function() {
-                    if (this.status === 200) {
-                        var data = JSON.parse(request.responseText).data;
-                        var gif = {
-                            url: data.fixed_width_downsampled_url,
-                            sourceUrl: data.url
-                        }
-                        resolve(gif);
-                    } else {
-                        reject(new Error(this.statusText));
-                    }
-                };
-                request.onerror = function() {
-                    reject(new Error(
-                        `XMLHttpRequest Error: ${this.statusText}`));
-                };
-                request.open('GET', url);
-                request.send();
-            });
-    },
+
+  getGif: function(searchingText) { // 1
+    return new Promise (
+      (resolve, reject) => {
+        const GIPHY_PUB_KEY = 'qYJUoExqhocza5OQXzJpzFgXT2AxuaGW';
+        const GIPHY_API_URL = 'https://api.giphy.com';
+        let url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText; // 2
+        let xhr = new XMLHttpRequest(); // 3
+        xhr.open('GET', url);
+        xhr.onload = function() {
+          if (this.status === 200) {
+            let data = JSON.parse(xhr.responseText).data; // 4
+            let gif = { // 5
+              url: data.fixed_width_downsampled_url,
+              sourceUrl: data.url
+            };
+            resolve(gif); // 6.
+          }
+          reject(new Error(this.statusText));
+        };
+        xhr.onerror = function () {
+          reject(new Error(`XMLHttpRequest Error: ${this.statusText}`));
+        };
+        xhr.send();
+      }
+    );
+  },
+
 
 
   render: function() {
